@@ -1,0 +1,14 @@
+2025-04-30 00:32:14,566 - s3_auto_upload - INFO - Registered auto-upload to S3 bucket telemetrydatapav on application exit
+2025-04-30 00:34:33,239 - s3_auto_upload - INFO - Application closing, waiting 2 seconds before upload...
+2025-04-30 00:34:35,271 - botocore.credentials - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-04-30 00:34:35,639 - s3_auto_upload - ERROR - Failed to initialize S3 client: 'S3' object has no attribute 'get_caller_identity'
+2025-04-30 00:34:35,640 - s3_auto_upload - ERROR - S3 client not initialized
+2025-04-30 00:34:35,640 - s3_auto_upload - ERROR - Failed to ensure bucket exists: telemetrydatapav
+2025-04-30 00:34:35,640 - s3_auto_upload - INFO - Auto-upload complete. Uploaded 0 files to S3 bucket telemetrydatapav
+2025-04-30 00:35:52,213 - s3_auto_upload - INFO - Registered auto-upload to S3 bucket telemetrydatapav on application exit
+2025-04-30 00:51:25,947 - s3_auto_upload - INFO - Application closing, waiting 2 seconds before upload...
+2025-04-30 00:51:27,985 - botocore.credentials - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-04-30 00:51:28,216 - s3_auto_upload - ERROR - Failed to initialize S3 client: 'S3' object has no attribute 'get_caller_identity'
+2025-04-30 00:51:28,217 - s3_auto_upload - ERROR - S3 client not initialized
+2025-04-30 00:51:28,217 - s3_auto_upload - ERROR - Failed to ensure bucket exists: telemetrydatapav
+2025-04-30 00:51:28,217 - s3_auto_upload - INFO - Auto-upload complete. Uploaded 0 files to S3 bucket telemetrydatapav

@@ -7,11 +7,14 @@ This module listens for UDP telemetry data from Forza Horizon 5 and logs it.
 import socket
 import time
 import threading
-from .data_parser import parse_packet
+from .data_parser import parse_packet, parser
 from .data_logger import log_telemetry
 
 def listen_for_telemetry(socketio):
     """Listen for UDP telemetry data from Forza Horizon 5"""
+    # Set socketio instance for the parser
+    parser.socketio = socketio
+    
     # Forza sends data on UDP
     UDP_IP = "127.0.0.1"  # Listen only on localhost
     UDP_PORT = 5300  # Default Forza data port
@@ -21,6 +24,7 @@ def listen_for_telemetry(socketio):
     
     print(f"Listening for Forza telemetry on {UDP_IP}:{UDP_PORT}")
     print("Telemetry will be logged and exported to CSV when the application closes")
+    print("Crash detection is enabled")
 
     # Update rate control (emits every 100ms for smoother UI updates)
     UPDATE_INTERVAL = 0.1  # seconds

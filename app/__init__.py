@@ -21,10 +21,22 @@ def create_app():
     from .websocket_handler import register_handlers
     register_handlers(socketio)
     
+    # Initialize CANoe integration
+    from .canoe_integration import initialize as init_canoe
+    canoe_interface = init_canoe(app, socketio)
+    
+    # Initialize DTC Analyzer
+    from .data_learning import initialize as init_learning
+    analyzer = init_learning(app, socketio, canoe_interface)
+    
     # Serve the main dashboard
     @app.route('/')
     def index():
         return send_from_directory(template_dir, 'index.html')
+    
+    # Ensure required directories exist
+    for directory in ['telemetry_exports', 'dtc_logs', 'models', 'analysis_results']:
+        os.makedirs(directory, exist_ok=True)
     
     # Start the UDP telemetry listener
     start_listener(socketio)

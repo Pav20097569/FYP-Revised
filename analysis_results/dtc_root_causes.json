@@ -1,0 +1,85 @@
+{
+  "P0100": {
+    "occurrences": 2966,
+    "conditions": {
+      "speed": {
+        "active": {
+          "mean": 125.3645144976399,
+          "median": 119.1,
+          "std": 70.66935388673981,
+          "min": 0.0,
+          "max": 514.5
+        },
+        "inactive": {
+          "mean": 124.56224390243902,
+          "median": 119.3,
+          "std": 70.22329808902857,
+          "min": 0.0,
+          "max": 515.5
+        },
+        "mean_difference": 0.8022705952008806,
+        "effect_size": 0.011388338048365249,
+        "significant": false
+      },
+      "rpm": {
+        "active": {
+          "mean": 4408.07923128793,
+          "median": 4276.0,
+          "std": 1941.3042218434666,
+          "min": 940.0,
+          "max": 9691.0
+        },
+        "inactive": {
+          "mean": 4452.84491374182,
+          "median": 4305.0,
+          "std": 1992.408574907424,
+          "min": 940.0,
+          "max": 9691.0
+        },
+        "mean_difference": -44.765682453889895,
+        "effect_size": 0.022758095244922946,
+        "significant": false
+      },
+      "throttle": {
+        "active": {
+          "mean": 0.31420094403236687,
+          "median": 0.22,
+          "std": 0.35208195822522464,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.31989589530041634,
+          "median": 0.22,
+          "std": 0.35936284910314803,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.005694951268049475,
+        "effect_size": 0.01600869949724508,
+        "significant": false
+      },
+      "brake": {
+        "active": {
+          "mean": 0.032508428860418076,
+          "median": 0.0,
+          "std": 0.16974868566924037,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.033241522903033914,
+          "median": 0.0,
+          "std": 0.17284898763844356,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.000733094042615838,
+        "effect_size": 0.004279445451408733,
+        "significant": false
+      }
+    },
+    "significant_features": [],
+    "root_cause_hypothesis": "No clear pattern identified for this DTC"
+  }
+}

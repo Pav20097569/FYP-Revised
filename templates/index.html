@@ -1,371 +1,1138 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Forza Horizon 5 Telemetry</title>
+  <title>Forza Dashboard with CANoe Integration</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
   <style>
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #121212;
       color: #ffffff;
-      text-align: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
       overflow-x: hidden;
     }
     
-    h1 {
-      color: #4CAF50;
-      margin-bottom: 30px;
+    .navbar {
+      background: #1e1e1e;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
     
-    .dashboard {
+    .navbar h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .navbar-right {
+      display: flex;
+      align-items: center;
+    }
+    
+    .connection-status {
+      margin-right: 20px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .status-indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    .status-connected {
+      background-color: #4CAF50;
+    }
+    
+    .status-disconnected {
+      background-color: #F44336;
+    }
+    
+    
+    @keyframes crash-flash {
+      0% { opacity: 0.8; }
+      100% { opacity: 0; }
+    }
+    
+    .container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: 1fr 1fr;
       gap: 20px;
       max-width: 1200px;
-      margin: 0 auto;
+      margin: 20px auto;
+      padding: 0 20px;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
     }
     
     .card {
       background: #1e1e1e;
-      border-radius: 10px;
+      border-radius: 8px;
       padding: 20px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
-      transition: transform 0.3s ease;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
     }
     
-    .card:hover {
-      transform: translateY(-5px);
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-top: 0;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .card-title i {
+      margin-right: 10px;
     }
     
     .value {
       font-weight: bold;
-      font-size: 2.5em;
       color: #4CAF50;
       transition: all 0.3s ease;
-      display: block;
-      margin: 10px 0;
     }
     
-    .label {
-      font-size: 1.2em;
-      opacity: 0.8;
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    
+    .gauge-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    
+    .gauge {
+      position: relative;
+      width: 120px;
+      height: 60px;
+      overflow: hidden;
+      margin: 10px auto;
+    }
+    
+    .gauge-background {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 10px solid #333;
+      border-bottom-color: transparent;
+      box-sizing: border-box;
+      clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    }
+    
+    .gauge-fill {
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 10px solid #4CAF50;
+      border-bottom-color: transparent;
+      box-sizing: border-box;
+      transition: transform 0.3s ease;
+      transform-origin: center bottom;
+      clip-path: polygon(0 0, 100% 0, 100% 50%, 0 50%);
+    }
+    
+    .gauge-cover {
+      position: absolute;
+      width: 90px;
+      height: 45px;
+      border-radius: 45px 45px 0 0;
+      background: #1e1e1e;
+      top: 5px;
+      left: 15px;
+    }
+    
+    .gauge-value {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      text-align: center;
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+    
+    .gauge-label {
+      text-align: center;
+      font-size: 0.8rem;
+      margin-top: 5px;
+    }
+    
+    .notification {
+      background: rgba(33, 150, 243, 0.1);
+      border-left: 4px solid #2196F3;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+    
+    .notification.warning {
+      background: rgba(255, 152, 0, 0.1);
+      border-left-color: #FF9800;
+    }
+    
+    .notification.error {
+      background: rgba(244, 67, 54, 0.1);
+      border-left-color: #F44336;
+    }
+    
+    .notification-title {
+      font-weight: bold;
       margin-bottom: 5px;
     }
     
-    /* RPM bar styles */
-    .rpm-container {
-      width: 100%;
-      height: 30px;
-      background: #2c2c2c;
-      border-radius: 15px;
-      margin-top: 10px;
-      overflow: hidden;
-      position: relative;
-    }
-    
-    .rpm-bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #4CAF50, #FFEB3B, #FF5722);
-      transition: width 0.2s ease;
-    }
-    
-    .rpm-redline {
-      position: absolute;
-      right: 10%;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background-color: #FF5722;
-    }
-    
-    /* Pedal indicators */
-    .pedals {
+    .dtc-item {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
+    }
+    
+    .dtc-code {
+      font-weight: bold;
+      color: #F44336;
+    }
+    
+    .dtc-description {
+      color: #aaa;
+      font-size: 0.9rem;
+    }
+    
+    .dtc-status {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+    
+    .dtc-status.active {
+      background: #F44336;
+      color: white;
+    }
+    
+    .dtc-status.pending {
+      background: #FF9800;
+      color: white;
+    }
+    
+    .dtc-status.predicted {
+      background: #2196F3;
+      color: white;
+    }
+    
+    .dtc-actions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: flex-end;
+    }
+    
+    button {
+      background: #333;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 10px;
+      transition: background 0.3s ease;
+    }
+    
+    button:hover {
+      background: #444;
+    }
+    
+    button.primary {
+      background: #2196F3;
+    }
+    
+    button.danger {
+      background: #F44336;
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #333;
+    }
+    
+    .tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom-color: #2196F3;
+      color: #2196F3;
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    
+    .metric {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 15px;
+      border-radius: 4px;
+      text-align: center;
+    }
+    
+    .metric-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      margin: 5px 0;
+    }
+    
+    .metric-label {
+      font-size: 0.8rem;
+      color: #aaa;
+    }
+    
+    #anomaly-gauge .gauge-fill {
+      border-color: #FF9800;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 5px 0;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: #2196F3;
+      transition: width 0.3s ease;
+    }
+    
+    .progress-fill.warning {
+      background: #FF9800;
+    }
+    
+    .progress-fill.danger {
+      background: #F44336;
+    }
+    
+    #analysis-results {
       margin-top: 20px;
     }
     
-    .pedal {
-      position: relative;
-      width: 60px;
-      height: 100px;
-      background: #2c2c2c;
-      border-radius: 10px 10px 0 0;
-      overflow: hidden;
+    #analysis-results h3 {
+      margin-top: 0;
+      font-size: 1rem;
+      color: #aaa;
     }
     
-    .pedal-fill {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      background: #4CAF50;
-      height: 0%;
-      transition: height 0.2s ease;
+    #analysis-results ul {
+      padding-left: 20px;
+      margin: 0;
     }
     
-    .pedal-brake .pedal-fill {
-      background: #FF5722;
+    #analysis-results li {
+      margin-bottom: 5px;
     }
     
-    .pedal-label {
+    .correlation-bar {
+      height: 10px;
+      background: #333;
       margin-top: 5px;
-      font-size: 0.8em;
+      position: relative;
     }
     
-    /* Connection status */
-    .connection {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.8em;
-      opacity: 0.8;
+    .correlation-value {
+      height: 100%;
+      background: #2196F3;
     }
     
-    .connection.connected {
-      background: #4CAF50;
+    .correlation-negative {
+      background: #F44336;
     }
     
-    .connection.disconnected {
-      background: #FF5722;
+    .anomaly-warning {
+      animation: pulse 2s infinite;
     }
     
-    /* Gear indicator styles */
-    .gear-indicator {
-      font-size: 4em;
-      font-weight: bold;
-      width: 100px;
-      height: 100px;
-      line-height: 100px;
-      border-radius: 50%;
-      background: #2c2c2c;
-      margin: 0 auto;
-      border: 4px solid #4CAF50;
-    }
-    
-    .gear-neutral {
-      color: #FFEB3B;
-      border-color: #FFEB3B;
-    }
-    
-    .gear-reverse {
-      color: #FF5722;
-      border-color: #FF5722;
-    }
-    
-    /* Export button styles */
-    .export-section {
-      margin-top: 30px;
-    }
-    
-    .btn {
-      background-color: #4CAF50;
-      border: none;
-      color: white;
-      padding: 10px 20px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-      font-size: 16px;
-      margin: 4px 2px;
-      cursor: pointer;
-      border-radius: 5px;
-      transition: background-color 0.3s;
-    }
-    
-    .btn:hover {
-      background-color: #45a049;
-    }
-    
-    .btn-warning {
-      background-color: #ff9800;
-    }
-    
-    .btn-warning:hover {
-      background-color: #e68a00;
-    }
-    
-    /* Status message */
-    .status-message {
-      margin-top: 10px;
-      font-size: 14px;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-    
-    .status-message.visible {
-      opacity: 1;
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0.4);
+      }
+      70% {
+        box-shadow: 0 0 0 10px rgba(255, 152, 0, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 152, 0, 0);
+      }
     }
   </style>
 </head>
 <body>
-  <div id="connection" class="connection disconnected">Disconnected</div>
-  <h1>🏎️ Forza Horizon 5 Telemetry</h1>
-  
-  <div class="dashboard">
-    <div class="card">
-      <div class="label">Speed</div>
-      <span id="speed" class="value">0</span>
-      <div class="label">km/h</div>
-    </div>
-    
-    <div class="card">
-      <div class="label">Gear</div>
-      <div id="gear" class="gear-indicator">N</div>
-    </div>
-    
-    <div class="card">
-      <div class="label">RPM</div>
-      <span id="rpm" class="value">0</span>
-      <div class="rpm-container">
-        <div class="rpm-redline"></div>
-        <div id="rpm-bar" class="rpm-bar"></div>
+  <div class="navbar">
+    <h1>🚗 Forza + CANoe Telemetry Dashboard</h1>
+    <div class="navbar-right">
+      <div class="connection-status">
+        <span class="status-indicator status-disconnected" id="connection-indicator"></span>
+        <span id="connection-status">Disconnected</span>
       </div>
-    </div>
-    
-    <div class="card">
-      <div class="label">Pedals</div>
-      <div class="pedals">
-        <div>
-          <div class="pedal">
-            <div id="throttle-fill" class="pedal-fill"></div>
-          </div>
-          <div class="pedal-label">Throttle</div>
-        </div>
-        <div>
-          <div class="pedal pedal-brake">
-            <div id="brake-fill" class="pedal-fill"></div>
-          </div>
-          <div class="pedal-label">Brake</div>
-        </div>
-      </div>
+      <button id="export-btn">Export Data</button>
     </div>
   </div>
   
-  <div class="export-section">
-    <p>Telemetry data is automatically saved to CSV when the application closes.</p>
-    <button id="exportBtn" class="btn">Export Telemetry Now</button>
-    <button id="clearBtn" class="btn btn-warning">Clear Telemetry Data</button>
-    <div id="statusMessage" class="status-message">Data will be exported to the telemetry_exports folder</div>
+  <div class="container">
+    <!-- Vehicle Telemetry -->
+    <div class="card">
+      <h2 class="card-title"><i class="fas fa-tachometer-alt"></i> Vehicle Telemetry</h2>
+      <div class="card-grid">
+        <div>
+          <p>Speed: <span id="speed" class="value">0</span> km/h</p>
+          <p>RPM: <span id="rpm" class="value">0</span></p>
+          <p>Gear: <span id="gear" class="value">N</span></p>
+        </div>
+        <div>
+          <p>Throttle: <span id="throttle" class="value">0</span>%</p>
+          <p>Brake: <span id="brake" class="value">0</span>%</p>
+          <p>Status: <span id="vehicle-status" class="value">Standby</span></p>
+        </div>
+      </div>
+      
+      <div class="gauge-container">
+        <div>
+          <div class="gauge">
+            <div class="gauge-background"></div>
+            <div class="gauge-fill" id="throttle-gauge"></div>
+            <div class="gauge-cover"></div>
+            <div class="gauge-value" id="throttle-gauge-value">0%</div>
+          </div>
+          <div class="gauge-label">Throttle</div>
+        </div>
+        
+        <div>
+          <div class="gauge">
+            <div class="gauge-background"></div>
+            <div class="gauge-fill" id="brake-gauge" style="border-color: #F44336;"></div>
+            <div class="gauge-cover"></div>
+            <div class="gauge-value" id="brake-gauge-value">0%</div>
+          </div>
+          <div class="gauge-label">Brake</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Diagnostic Trouble Codes -->
+    <h2 class="card-title"><i class="fas fa-exclamation-triangle"></i> Diagnostic Trouble Codes</h2>
+      
+      <div class="tabs">
+        <div class="tab active" data-tab="active-dtcs">Active DTCs</div>
+        <div class="tab" data-tab="predicted-dtcs">Predicted DTCs</div>
+      </div>
+      
+      <div class="tab-content active" id="active-dtcs">
+        <div id="dtc-list">
+          <!-- DTCs will be added here dynamically -->
+          <div class="notification">
+            <div class="notification-title">No active DTCs</div>
+            <div>Vehicle reporting no diagnostic trouble codes</div>
+          </div>
+        </div>
+        
+        <div class="dtc-actions">
+          <button id="clear-dtcs" class="danger">Clear DTCs</button>
+          <button id="add-test-dtc" class="primary">Add Test DTC</button>
+        </div>
+      </div>
+      
+      <div class="tab-content" id="predicted-dtcs">
+        <div id="predicted-dtc-list">
+          <!-- Predicted DTCs will be added here dynamically -->
+          <div class="notification">
+            <div class="notification-title">No predicted DTCs</div>
+            <div>AI analysis predicts no upcoming issues</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Performance Metrics -->
+    <div class="card">
+      <h2 class="card-title"><i class="fas fa-chart-line"></i> Performance Metrics</h2>
+      
+      <div class="metrics">
+        <div class="metric">
+          <div class="metric-label">Average Speed</div>
+          <div class="metric-value" id="avg-speed">0 km/h</div>
+        </div>
+        
+        <div class="metric">
+          <div class="metric-label">Max Speed</div>
+          <div class="metric-value" id="max-speed">0 km/h</div>
+        </div>
+        
+        <div class="metric">
+          <div class="metric-label">Throttle Changes</div>
+          <div class="metric-value" id="throttle-changes">0</div>
+        </div>
+        
+        <div class="metric">
+          <div class="metric-label">Brake Intensity</div>
+          <div class="metric-value" id="brake-intensity">0%</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Anomaly Detection -->
+    <div class="card">
+      <h2 class="card-title"><i class="fas fa-search"></i> Anomaly Detection</h2>
+      
+      <div id="anomaly-info">
+        <div class="gauge">
+          <div class="gauge-background"></div>
+          <div class="gauge-fill" id="anomaly-gauge"></div>
+          <div class="gauge-cover"></div>
+          <div class="gauge-value" id="anomaly-value">0%</div>
+        </div>
+        <div class="gauge-label" id="anomaly-label">Normal Operation</div>
+        
+        <div id="recent-anomalies" style="margin-top: 15px;">
+          <div class="notification">
+            <div class="notification-title">Monitoring for anomalies</div>
+            <div>Telemetry data is being analyzed for unusual patterns</div>
+          </div>
+        </div>
+      </div>
+      
+      <div id="analysis-results">
+        <h3>Root Cause Analysis</h3>
+        <div id="root-cause-content">
+          <div class="notification">
+            <div class="notification-title">Not enough data</div>
+            <div>More driving data needed for detailed analysis</div>
+          </div>
+        </div>
+        
+        <button id="train-models" class="primary" style="margin-top: 10px;">Train Analysis Models</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Test DTC Modal -->
+  <div id="test-dtc-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
+    <div style="background: #1e1e1e; max-width: 400px; margin: 100px auto; padding: 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.5);">
+      <h3 style="margin-top: 0;">Add Test DTC</h3>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">DTC Code</label>
+        <input type="text" id="test-dtc-code" placeholder="e.g. P0300" style="width: 100%; padding: 8px; background: #333; border: none; color: white; border-radius: 4px;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">Description</label>
+        <input type="text" id="test-dtc-description" placeholder="DTC Description" style="width: 100%; padding: 8px; background: #333; border: none; color: white; border-radius: 4px;">
+      </div>
+      
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; margin-bottom: 5px;">Status</label>
+        <select id="test-dtc-status" style="width: 100%; padding: 8px; background: #333; border: none; color: white; border-radius: 4px;">
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+        </select>
+      </div>
+      
+      <div style="text-align: right;">
+        <button id="cancel-test-dtc" style="background: #333; margin-right: 10px;">Cancel</button>
+        <button id="confirm-test-dtc" class="primary">Add DTC</button>
+      </div>
+    </div>
   </div>
 
   <script>
-    // Connect to Socket.IO server
+    // Initialize Socket.IO connection
     const socket = io();
     
-    // Max RPM for scaling (will be updated from telemetry)
-    let maxRpm = 8000;
-    
-    // Smoothing variables
+    // Smoothing variables for telemetry
     let smoothSpeed = 0;
     let smoothRpm = 0;
     let smoothThrottle = 0;
     let smoothBrake = 0;
     
-    // Smoothing factor (higher = smoother but less responsive)
-    const SMOOTHING_FACTOR = 0.7;
+    // Performance metrics
+    let speedHistory = [];
+    let maxSpeed = 0;
+    let throttleChangeCount = 0;
+    let lastThrottle = 0;
     
-    // Connection handling
-    const connectionStatus = document.getElementById('connection');
+    // Connection state
+    let isConnected = false;
     
+    // Update connection indicator
+    function updateConnectionStatus(connected) {
+      const indicator = document.getElementById('connection-indicator');
+      const status = document.getElementById('connection-status');
+      
+      if (connected) {
+        indicator.className = 'status-indicator status-connected';
+        status.textContent = 'Connected';
+        isConnected = true;
+      } else {
+        indicator.className = 'status-indicator status-disconnected';
+        status.textContent = 'Disconnected';
+        isConnected = false;
+      }
+    }
+    
+    // Update gauge display
+    function updateGauge(id, valueId, value) {
+      const gauge = document.getElementById(id);
+      const gaugeValue = document.getElementById(valueId);
+      
+      // Convert value to percentage (0-100)
+      const percentage = Math.min(100, Math.max(0, value * 100));
+      
+      // Calculate rotation for gauge fill
+      const rotation = (percentage / 100) * 180;
+      gauge.style.transform = `rotate(${rotation}deg)`;
+      
+      // Update gauge value
+      gaugeValue.textContent = `${Math.round(percentage)}%`;
+    }
+    
+    // Update vehicle status based on telemetry
+    function updateVehicleStatus(data) {
+      const statusElement = document.getElementById('vehicle-status');
+      
+      if (data.speed < 1) {
+        statusElement.textContent = 'Stopped';
+        statusElement.style.color = '#aaa';
+      } else if (data.throttle > 0.8) {
+        statusElement.textContent = 'Accelerating';
+        statusElement.style.color = '#4CAF50';
+      } else if (data.brake > 0.5) {
+        statusElement.textContent = 'Braking';
+        statusElement.style.color = '#F44336';
+      } else if (data.speed > 100) {
+        statusElement.textContent = 'High Speed';
+        statusElement.style.color = '#FF9800';
+      } else {
+        statusElement.textContent = 'Cruising';
+        statusElement.style.color = '#2196F3';
+      }
+    }
+    
+    // Update performance metrics
+    function updatePerformanceMetrics(data) {
+      // Add to speed history (max 300 points)
+      speedHistory.push(data.speed);
+      if (speedHistory.length > 300) {
+        speedHistory.shift();
+      }
+      
+      // Calculate average speed
+      const avgSpeed = speedHistory.reduce((sum, speed) => sum + speed, 0) / speedHistory.length;
+      document.getElementById('avg-speed').textContent = `${Math.round(avgSpeed)} km/h`;
+      
+      // Update max speed
+      maxSpeed = Math.max(maxSpeed, data.speed);
+      document.getElementById('max-speed').textContent = `${Math.round(maxSpeed)} km/h`;
+      
+      // Track throttle changes
+      if (Math.abs(data.throttle - lastThrottle) > 0.2) {
+        throttleChangeCount++;
+        lastThrottle = data.throttle;
+      }
+      document.getElementById('throttle-changes').textContent = throttleChangeCount;
+      
+      // Brake intensity
+      document.getElementById('brake-intensity').textContent = `${Math.round(data.brake * 100)}%`;
+    }
+    
+    // Update DTC list
+    function updateDTCList(dtcs) {
+      const dtcList = document.getElementById('dtc-list');
+      
+      // Clear existing content
+      dtcList.innerHTML = '';
+      
+      if (Object.keys(dtcs).length === 0) {
+        dtcList.innerHTML = `
+          <div class="notification">
+            <div class="notification-title">No active DTCs</div>
+            <div>Vehicle reporting no diagnostic trouble codes</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Add each DTC
+      for (const [code, info] of Object.entries(dtcs)) {
+        const dtcElement = document.createElement('div');
+        dtcElement.className = 'dtc-item';
+        
+        dtcElement.innerHTML = `
+          <div>
+            <div class="dtc-code">${code}</div>
+            <div class="dtc-description">${info.description || 'Unknown DTC'}</div>
+          </div>
+          <div>
+            <span class="dtc-status ${info.status || 'active'}">${info.status || 'active'}</span>
+          </div>
+        `;
+        
+        dtcList.appendChild(dtcElement);
+      }
+    }
+    
+    // Update predicted DTC list
+    function updatePredictedDTCList(predictions) {
+      const predictedList = document.getElementById('predicted-dtc-list');
+      
+      // Clear existing content
+      predictedList.innerHTML = '';
+      
+      if (!predictions || Object.keys(predictions).length === 0) {
+        predictedList.innerHTML = `
+          <div class="notification">
+            <div class="notification-title">No predicted DTCs</div>
+            <div>AI analysis predicts no upcoming issues</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Add each predicted DTC
+      for (const [key, prediction] of Object.entries(predictions)) {
+        if (!prediction.predicted) continue;
+        
+        const probability = Math.round(prediction.probability * 100);
+        const dtcCode = prediction.dtc_code;
+        
+        const dtcElement = document.createElement('div');
+        dtcElement.className = 'dtc-item';
+        
+        dtcElement.innerHTML = `
+          <div>
+            <div class="dtc-code">${dtcCode}</div>
+            <div class="dtc-description">Predicted DTC (${probability}% confidence)</div>
+          </div>
+          <div>
+            <span class="dtc-status predicted">predicted</span>
+          </div>
+          <div class="progress-bar" style="margin-top: 5px;">
+            <div class="progress-fill ${probability > 75 ? 'danger' : probability > 50 ? 'warning' : ''}" 
+                 style="width: ${probability}%;"></div>
+          </div>
+        `;
+        
+        predictedList.appendChild(dtcElement);
+      }
+      
+      // If no predicted DTCs (all probabilities below threshold)
+      if (predictedList.children.length === 0) {
+        predictedList.innerHTML = `
+          <div class="notification">
+            <div class="notification-title">No predicted DTCs</div>
+            <div>AI analysis predicts no upcoming issues</div>
+          </div>
+        `;
+      }
+    }
+    
+    // Update anomaly detection
+    function updateAnomalyDetection(anomalies) {
+      if (!anomalies) return;
+      
+      const anomalyValue = document.getElementById('anomaly-value');
+      const anomalyLabel = document.getElementById('anomaly-label');
+      const anomalyGauge = document.getElementById('anomaly-gauge');
+      const recentAnomalies = document.getElementById('recent-anomalies');
+      
+      // Update gauge
+      const percentage = anomalies.anomaly_percentage || 0;
+      anomalyValue.textContent = `${Math.round(percentage)}%`;
+      
+      // Calculate rotation for gauge fill
+      const rotation = (percentage / 100) * 180;
+      anomalyGauge.style.transform = `rotate(${rotation}deg)`;
+      
+      // Update label based on anomaly percentage
+      if (percentage < 10) {
+        anomalyLabel.textContent = 'Normal Operation';
+        anomalyLabel.style.color = '#4CAF50';
+        recentAnomalies.classList.remove('anomaly-warning');
+      } else if (percentage < 25) {
+        anomalyLabel.textContent = 'Minor Anomalies';
+        anomalyLabel.style.color = '#2196F3';
+        recentAnomalies.classList.remove('anomaly-warning');
+      } else if (percentage < 50) {
+        anomalyLabel.textContent = 'Moderate Anomalies';
+        anomalyLabel.style.color = '#FF9800';
+        recentAnomalies.classList.add('anomaly-warning');
+      } else {
+        anomalyLabel.textContent = 'Significant Anomalies';
+        anomalyLabel.style.color = '#F44336';
+        recentAnomalies.classList.add('anomaly-warning');
+      }
+      
+      // Update recent anomalies info
+      if (anomalies.recent_anomalies > 0) {
+        recentAnomalies.innerHTML = `
+          <div class="notification ${percentage > 25 ? 'warning' : ''}">
+            <div class="notification-title">Detected ${anomalies.recent_anomalies} anomalies in recent data</div>
+            <div>Unusual driving patterns detected. This may indicate potential issues.</div>
+          </div>
+        `;
+      } else {
+        recentAnomalies.innerHTML = `
+          <div class="notification">
+            <div class="notification-title">No anomalies detected</div>
+            <div>Current driving patterns appear normal</div>
+          </div>
+        `;
+      }
+    }
+    
+    // Update root cause analysis
+    function updateRootCauseAnalysis(data) {
+      const rootCauseContent = document.getElementById('root-cause-content');
+      
+      // If no analysis data available
+      if (!data || Object.keys(data).length === 0) {
+        rootCauseContent.innerHTML = `
+          <div class="notification">
+            <div class="notification-title">Not enough data</div>
+            <div>More driving data needed for detailed analysis</div>
+          </div>
+        `;
+        return;
+      }
+      
+      // Clear existing content
+      rootCauseContent.innerHTML = '';
+      
+      // Add analysis for each DTC
+      for (const [dtcCode, analysis] of Object.entries(data)) {
+        const analysisElement = document.createElement('div');
+        analysisElement.style.marginBottom = '15px';
+        
+        let significantFeatures = '';
+        if (analysis.significant_features && analysis.significant_features.length > 0) {
+          significantFeatures = `
+            <div style="margin-top: 5px;">
+              <div style="font-weight: bold; margin-bottom: 3px;">Key Factors:</div>
+              <ul style="margin-top: 5px; padding-left: 20px;">
+                ${analysis.significant_features.slice(0, 3).map(feature => `<li>${feature}</li>`).join('')}
+              </ul>
+            </div>
+          `;
+        }
+        
+        analysisElement.innerHTML = `
+          <div class="dtc-item">
+            <div>
+              <div class="dtc-code">${dtcCode}</div>
+              <div class="dtc-description">
+                ${analysis.root_cause_hypothesis || 'No clear pattern identified'}
+                ${significantFeatures}
+              </div>
+            </div>
+          </div>
+        `;
+        
+        rootCauseContent.appendChild(analysisElement);
+      }
+    }
+    
+    // Socket.IO event handlers
     socket.on('connect', () => {
-      console.log("✅ Connected to server");
-      connectionStatus.textContent = "Connected";
-      connectionStatus.className = "connection connected";
+      console.log('Connected to server');
+      updateConnectionStatus(true);
+      
+      // Load root cause analysis data
+      fetch('/api/dtc-analysis')
+        .then(response => response.json())
+        .then(data => {
+          // Check if we got actual analysis data
+          if (data && !data.message) {
+            updateRootCauseAnalysis(data);
+          }
+        })
+        .catch(err => console.error('Error loading DTC analysis:', err));
     });
     
     socket.on('disconnect', () => {
-      console.log("❌ Disconnected from server");
-      connectionStatus.textContent = "Disconnected";
-      connectionStatus.className = "connection disconnected";
+      console.log('Disconnected from server');
+      updateConnectionStatus(false);
     });
-
-    // Telemetry data handling
+    
     socket.on('telemetry', (data) => {
-      console.log("📡 Got telemetry:", data);
+      console.log('Got telemetry:', data);
       
       // Apply smoothing to values
-      smoothSpeed = smoothSpeed * SMOOTHING_FACTOR + data.speed * (1 - SMOOTHING_FACTOR);
-      smoothRpm = smoothRpm * SMOOTHING_FACTOR + data.rpm * (1 - SMOOTHING_FACTOR);
+      smoothSpeed = smoothSpeed * 0.7 + data.speed * 0.3;
+      smoothRpm = smoothRpm * 0.7 + data.rpm * 0.3;
+      smoothThrottle = smoothThrottle * 0.7 + data.throttle * 0.3;
+      smoothBrake = smoothBrake * 0.7 + data.brake * 0.3;
       
-      if (data.throttle !== undefined) {
-        smoothThrottle = smoothThrottle * SMOOTHING_FACTOR + data.throttle * (1 - SMOOTHING_FACTOR);
-      }
-      
-      if (data.brake !== undefined) {
-        smoothBrake = smoothBrake * SMOOTHING_FACTOR + data.brake * (1 - SMOOTHING_FACTOR);
-      }
-      
-      // Update max RPM if needed (for scaling)
-      if (data.maxRpm && data.maxRpm > 100) {
-        maxRpm = data.maxRpm;
-      }
-      
-      // Update speed display
+      // Update display with smoothed values
       document.getElementById('speed').textContent = Math.round(smoothSpeed);
-      
-      // Update RPM display and bar
       document.getElementById('rpm').textContent = Math.round(smoothRpm);
-      const rpmPercentage = Math.min((smoothRpm / maxRpm) * 100, 100);
-      document.getElementById('rpm-bar').style.width = rpmPercentage + '%';
+      document.getElementById('gear').textContent = data.gear;
+      document.getElementById('throttle').textContent = Math.round(smoothThrottle * 100);
+      document.getElementById('brake').textContent = Math.round(smoothBrake * 100);
       
-      // Update gear indicator with special styling for N and R
-      const gearElement = document.getElementById('gear');
-      gearElement.textContent = data.gear;
-      gearElement.className = 'gear-indicator';
+      // Update gauges
+      updateGauge('throttle-gauge', 'throttle-gauge-value', smoothThrottle);
+      updateGauge('brake-gauge', 'brake-gauge-value', smoothBrake);
       
-      if (data.gear === 'N') {
-        gearElement.classList.add('gear-neutral');
-      } else if (data.gear === 'R') {
-        gearElement.classList.add('gear-reverse');
+      // Update vehicle status
+      updateVehicleStatus({
+        speed: smoothSpeed,
+        throttle: smoothThrottle,
+        brake: smoothBrake
+      });
+      
+      // Update performance metrics
+      updatePerformanceMetrics({
+        speed: smoothSpeed,
+        throttle: smoothThrottle,
+        brake: smoothBrake
+      });
+    });
+    
+    socket.on('dtc_update', (data) => {
+      console.log('DTC update:', data);
+      updateDTCList(data.dtcs);
+    });
+    
+    socket.on('dtc_new', (data) => {
+      console.log('New DTCs:', data);
+      // Could show notification here
+    });
+    
+    socket.on('dtc_cleared', (data) => {
+      console.log('DTCs cleared:', data);
+      // Could show notification here
+    });
+    
+    socket.on('telemetry_analysis', (data) => {
+      console.log('Telemetry analysis:', data);
+      
+      // Update anomaly detection
+      if (data.anomalies) {
+        updateAnomalyDetection(data.anomalies);
       }
       
-      // Update pedal indicators
-      if (data.throttle !== undefined) {
-        document.getElementById('throttle-fill').style.height = (smoothThrottle * 100) + '%';
-      }
-      
-      if (data.brake !== undefined) {
-        document.getElementById('brake-fill').style.height = (smoothBrake * 100) + '%';
+      // Update predicted DTCs
+      if (data.dtc_predictions) {
+        updatePredictedDTCList(data.dtc_predictions);
       }
     });
     
-    // Export button handling
-    document.getElementById('exportBtn').addEventListener('click', function() {
+    socket.on('training_complete', (data) => {
+      console.log('Training complete:', data);
+      
+      // Show notification
+      alert('Machine learning models trained successfully.');
+      
+      // Reload root cause analysis
+      fetch('/api/dtc-analysis')
+        .then(response => response.json())
+        .then(data => {
+          // Check if we got actual analysis data
+          if (data && !data.message) {
+            updateRootCauseAnalysis(data);
+          }
+        })
+        .catch(err => console.error('Error loading DTC analysis:', err));
+    });
+    // Add this to the JavaScript section in index.html, near the other Socket.IO event handlers
+
+    // Handle crash events
+    socket.on('crash_detected', (data) => {
+      console.log('Crash detected:', data);
+      
+      const severityColors = {
+        'minor': '#2196F3',    // Blue for minor crashes
+        'moderate': '#FF9800', // Orange for moderate crashes
+        'severe': '#F44336'    // Red for severe crashes
+      };
+      
+      // Add a notification for the crash
+      const recentAnomalies = document.getElementById('recent-anomalies');
+      
+      const crashNotification = document.createElement('div');
+      crashNotification.className = `notification ${data.severity === 'severe' ? 'error' : data.severity === 'moderate' ? 'warning' : ''}`;
+      
+      crashNotification.innerHTML = `
+        <div class="notification-title">
+          <i class="fas fa-car-crash" style="margin-right: 8px;"></i>
+          Vehicle Crash Detected (${data.severity})
+        </div>
+        <div>
+          Deceleration: ${data.deceleration.toFixed(1)} km/h (${data.deceleration_g}G)<br>
+          Speed change: ${data.previous_speed.toFixed(1)} → ${data.crash_speed.toFixed(1)} km/h
+        </div>
+        <div style="margin-top: 5px; font-size: 0.8em; color: #aaa;">
+          ${new Date().toLocaleTimeString()}
+        </div>
+      `;
+      
+      // Add to the DOM
+      if (recentAnomalies.firstChild) {
+        recentAnomalies.insertBefore(crashNotification, recentAnomalies.firstChild);
+      } else {
+        recentAnomalies.appendChild(crashNotification);
+      }
+      
+      // Limit the number of notifications (keep the 5 most recent)
+      const notifications = recentAnomalies.querySelectorAll('.notification');
+      if (notifications.length > 5) {
+        for (let i = 5; i < notifications.length; i++) {
+          recentAnomalies.removeChild(notifications[i]);
+        }
+      }
+           
+      // Add visual effect - flash the screen border briefly for severe crashes
+      if (data.severity === 'severe') {
+        const flashElement = document.createElement('div');
+        flashElement.style.position = 'fixed';
+        flashElement.style.top = '0';
+        flashElement.style.left = '0';
+        flashElement.style.right = '0';
+        flashElement.style.bottom = '0';
+        flashElement.style.border = `10px solid ${severityColors[data.severity]}`;
+        flashElement.style.boxShadow = `0 0 20px ${severityColors[data.severity]}`;
+        flashElement.style.pointerEvents = 'none';
+        flashElement.style.zIndex = '9999';
+        flashElement.style.opacity = '0.8';
+        flashElement.style.animation = 'crash-flash 1s ease-out forwards';
+        
+        document.body.appendChild(flashElement);
+        
+        // Remove the flash effect after animation completes
+        setTimeout(() => {
+          document.body.removeChild(flashElement);
+        }, 1000);
+      }
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        
+        // Add active class to clicked tab
+        tab.classList.add('active');
+        
+        // Hide all tab content
+        document.querySelectorAll('.tab-content').forEach(content => {
+          content.classList.remove('active');
+        });
+        
+        // Show related tab content
+        const tabContentId = tab.getAttribute('data-tab');
+        document.getElementById(tabContentId).classList.add('active');
+      });
+    });
+    
+    // Export data button
+    document.getElementById('export-btn').addEventListener('click', () => {
+      if (!isConnected) {
+        alert('Cannot export data: Not connected to server');
+        return;
+      }
+      
       socket.emit('export_telemetry');
-      showStatusMessage('Telemetry exported to the telemetry_exports folder');
+      alert('Telemetry data exported!');
     });
     
-    // Clear button handling
-    document.getElementById('clearBtn').addEventListener('click', function() {
-      socket.emit('clear_telemetry');
-      showStatusMessage('Telemetry data cleared');
-    });
-    
-    // Status message handling
-    function showStatusMessage(message) {
-      const statusMessage = document.getElementById('statusMessage');
-      statusMessage.textContent = message;
-      statusMessage.classList.add('visible');
+    // Clear DTCs button
+    document.getElementById('clear-dtcs').addEventListener('click', () => {
+      if (!isConnected) {
+        alert('Cannot clear DTCs: Not connected to server');
+        return;
+      }
       
-      setTimeout(() => {
-        statusMessage.classList.remove('visible');
-      }, 3000);
-    }
-    
-    // Status message handling for export response
-    socket.on('export_complete', (data) => {
-      showStatusMessage(`Telemetry exported to: ${data.filename}`);
+      socket.emit('clear_dtcs');
     });
     
-    // Status message handling for clear response
-    socket.on('clear_complete', () => {
-      showStatusMessage('Telemetry data cleared successfully');
+    // Add Test DTC button
+    document.getElementById('add-test-dtc').addEventListener('click', () => {
+      document.getElementById('test-dtc-modal').style.display = 'block';
     });
+    
+    // Modal cancel button
+    document.getElementById('cancel-test-dtc').addEventListener('click', () => {
+      document.getElementById('test-dtc-modal').style.display = 'none';
+    });
+    
+    // Modal confirm button
+    document.getElementById('confirm-test-dtc').addEventListener('click', () => {
+      const code = document.getElementById('test-dtc-code').value.trim();
+      const description = document.getElementById('test-dtc-description').value.trim();
+      const status = document.getElementById('test-dtc-status').value;
+      
+      if (!code) {
+        alert('Please enter a DTC code');
+        return;
+      }
+      
+      socket.emit('add_test_dtc', {
+        code,
+        description: description || 'Test DTC',
+        status
+      });
+      
+      document.getElementById('test-dtc-modal').style.display = 'none';
+    });
+    
+    // Train models button
+    document.getElementById('train-models').addEventListener('click', () => {
+      if (!isConnected) {
+        alert('Cannot train models: Not connected to server');
+        return;
+      }
+      
+      if (confirm('Training machine learning models may take some time. Continue?')) {
+        fetch('/api/train-models')
+          .then(response => response.json())
+          .then(data => {
+            alert(data.message);
+          })
+          .catch(err => {
+            console.error('Error training models:', err);
+            alert('Error training models. See console for details.');
+          });
+      }
+    });
+    
+    // Initial connection status
+    updateConnectionStatus(false);
   </script>
 </body>
 </html>

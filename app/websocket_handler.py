@@ -6,6 +6,9 @@ This module handles WebSocket connections for the dashboard.
 import os
 from .data_logger import export_telemetry, clear_telemetry
 
+# Store a reference to the CANoe interface
+canoe_interface = None
+
 def register_handlers(socketio):
     """Register event handlers for Socket.IO"""
     @socketio.on('connect')
@@ -40,3 +43,10 @@ def register_handlers(socketio):
         print('Clearing telemetry data')
         clear_telemetry()
         socketio.emit('clear_complete')
+        
+    # Add a debugging handler for add_test_dtc
+    @socketio.on('add_test_dtc')
+    def handle_test_dtc(data):
+        """Debug handler for adding test DTCs"""
+        print(f"Received add_test_dtc event with data: {data}")
+        # This will be handled by the handler in canoe_integration.py but its here for debugging purposes

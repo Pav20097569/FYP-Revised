@@ -1,0 +1,22 @@
+{
+  "P0420": {
+    "occurrences": 2449,
+    "conditions": {
+      "speed": {
+        "active": {
+          "mean": 115.85634953042059,
+          "median": 96.9,
+          "std": 83.27747697590598,
+          "min": 0.0,
+          "max": 492.0
+        },
+        "inactive": {
+          "mean": 116.65500972412303,
+          "median": 97.7,
+          "std": 83.91451345443873,
+          "min": 0.0,
+          "max": 495.0
+        },
+        "mean_difference": -0.798660193702446,
+        "effect_size": 0.009553739917292954,
+        "significant": 
