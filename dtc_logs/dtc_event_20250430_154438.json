@@ -1,0 +1,11 @@
+{
+  "timestamp": "20250430_154438",
+  "event_type": "added",
+  "dtcs": {
+    "P0162": {
+      "description": "02 Sensor Circuit Malfunction (Bank 2 Sensor 3)",
+      "status": "active",
+      "timestamp": 1746024278.495233
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "timestamp": "20250430_154456",
+  "event_type": "added",
+  "dtcs": {
+    "P0175": {
+      "description": "System too Rich (Bank 2)",
+      "status": "active",
+      "timestamp": 1746024296.6474788
+    }
+  }
+}

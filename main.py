@@ -2,7 +2,7 @@ import eventlet
 eventlet.monkey_patch()
 
 from app import create_app, socketio
-from app.cloud_upload import register_s3_auto_upload  # Import the auto-upload module
+from app.s3_auto_upload import register_s3_auto_upload  # Correct import path
 
 app = create_app()
 

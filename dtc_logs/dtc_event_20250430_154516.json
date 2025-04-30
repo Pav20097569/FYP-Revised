@@ -1,0 +1,11 @@
+{
+  "timestamp": "20250430_154516",
+  "event_type": "added",
+  "dtcs": {
+    "P0198": {
+      "description": "Engine Oil Temperature Sensor High",
+      "status": "active",
+      "timestamp": 1746024316.3994222
+    }
+  }
+}

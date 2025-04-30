@@ -1,81 +1,330 @@
 {
   "P0100": {
-    "occurrences": 2966,
+    "occurrences": 909,
     "conditions": {
       "speed": {
         "active": {
-          "mean": 125.3645144976399,
-          "median": 119.1,
-          "std": 70.66935388673981,
+          "mean": 112.6678877887789,
+          "median": 107.7,
+          "std": 74.94711614492674,
           "min": 0.0,
-          "max": 514.5
+          "max": 520.0
         },
         "inactive": {
-          "mean": 124.56224390243902,
-          "median": 119.3,
-          "std": 70.22329808902857,
+          "mean": 108.80219957289847,
+          "median": 106.3,
+          "std": 70.54291254055667,
           "min": 0.0,
-          "max": 515.5
+          "max": 527.7
         },
-        "mean_difference": 0.8022705952008806,
-        "effect_size": 0.011388338048365249,
+        "mean_difference": 3.865688215880425,
+        "effect_size": 0.05311591835099751,
         "significant": false
       },
       "rpm": {
         "active": {
-          "mean": 4408.07923128793,
-          "median": 4276.0,
-          "std": 1941.3042218434666,
-          "min": 940.0,
-          "max": 9691.0
+          "mean": 3847.129812981298,
+          "median": 3656.0,
+          "std": 1311.7057532579595,
+          "min": 976.0,
+          "max": 7714.0
         },
         "inactive": {
-          "mean": 4452.84491374182,
-          "median": 4305.0,
-          "std": 1992.408574907424,
-          "min": 940.0,
-          "max": 9691.0
+          "mean": 3927.143661424966,
+          "median": 3729.0,
+          "std": 1353.6582412539249,
+          "min": 968.0,
+          "max": 8000.0
         },
-        "mean_difference": -44.765682453889895,
-        "effect_size": 0.022758095244922946,
+        "mean_difference": -80.01384844366794,
+        "effect_size": 0.06003228001236819,
         "significant": false
       },
       "throttle": {
         "active": {
-          "mean": 0.31420094403236687,
-          "median": 0.22,
-          "std": 0.35208195822522464,
+          "mean": 0.27174917491749173,
+          "median": 0.15,
+          "std": 0.3393166863999952,
           "min": 0.0,
           "max": 1.0
         },
         "inactive": {
-          "mean": 0.31989589530041634,
-          "median": 0.22,
-          "std": 0.35936284910314803,
+          "mean": 0.2762550960978451,
+          "median": 0.15,
+          "std": 0.3419382391300577,
           "min": 0.0,
           "max": 1.0
         },
-        "mean_difference": -0.005694951268049475,
-        "effect_size": 0.01600869949724508,
+        "mean_difference": -0.004505921180353367,
+        "effect_size": 0.013228198872144784,
         "significant": false
       },
       "brake": {
         "active": {
-          "mean": 0.032508428860418076,
+          "mean": 0.044785478547854786,
           "median": 0.0,
-          "std": 0.16974868566924037,
+          "std": 0.1895957999692707,
           "min": 0.0,
           "max": 1.0
         },
         "inactive": {
-          "mean": 0.033241522903033914,
+          "mean": 0.04164045816346341,
           "median": 0.0,
-          "std": 0.17284898763844356,
+          "std": 0.18734653946683355,
           "min": 0.0,
           "max": 1.0
         },
-        "mean_difference": -0.000733094042615838,
-        "effect_size": 0.004279445451408733,
+        "mean_difference": 0.003145020384391378,
+        "effect_size": 0.01668671340533203,
+        "significant": false
+      }
+    },
+    "significant_features": [],
+    "root_cause_hypothesis": "No clear pattern identified for this DTC"
+  },
+  "P0162": {
+    "occurrences": 909,
+    "conditions": {
+      "speed": {
+        "active": {
+          "mean": 107.61553355335533,
+          "median": 104.4,
+          "std": 69.96623521783575,
+          "min": 0.0,
+          "max": 508.8
+        },
+        "inactive": {
+          "mean": 109.69379149679673,
+          "median": 106.8,
+          "std": 71.45038031335264,
+          "min": 0.0,
+          "max": 527.7
+        },
+        "mean_difference": -2.0782579434414004,
+        "effect_size": 0.029390372462803908,
+        "significant": false
+      },
+      "rpm": {
+        "active": {
+          "mean": 3880.268426842684,
+          "median": 3694.0,
+          "std": 1287.3923335093657,
+          "min": 970.0,
+          "max": 7651.0
+        },
+        "inactive": {
+          "mean": 3921.295670743545,
+          "median": 3713.0,
+          "std": 1358.0280604428563,
+          "min": 968.0,
+          "max": 8000.0
+        },
+        "mean_difference": -41.02724390086087,
+        "effect_size": 0.031006509673116085,
+        "significant": false
+      },
+      "throttle": {
+        "active": {
+          "mean": 0.27324532453245326,
+          "median": 0.15,
+          "std": 0.33753108242028906,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.2759910696952048,
+          "median": 0.15,
+          "std": 0.34225248035417316,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.002745745162751556,
+        "effect_size": 0.00807809746883946,
+        "significant": false
+      },
+      "brake": {
+        "active": {
+          "mean": 0.04993399339933993,
+          "median": 0.0,
+          "std": 0.2025840665214676,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.04073189671908367,
+          "median": 0.0,
+          "std": 0.184903827402861,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": 0.009202096680256261,
+        "effect_size": 0.047446812300163926,
+        "significant": false
+      }
+    },
+    "significant_features": [],
+    "root_cause_hypothesis": "No clear pattern identified for this DTC"
+  },
+  "P0175": {
+    "occurrences": 909,
+    "conditions": {
+      "speed": {
+        "active": {
+          "mean": 106.74291529152914,
+          "median": 107.2,
+          "std": 66.18974862544536,
+          "min": 0.0,
+          "max": 525.4
+        },
+        "inactive": {
+          "mean": 109.84778295476605,
+          "median": 106.4,
+          "std": 72.0764590082048,
+          "min": 0.0,
+          "max": 527.7
+        },
+        "mean_difference": -3.1048676632369023,
+        "effect_size": 0.04487079701740529,
+        "significant": false
+      },
+      "rpm": {
+        "active": {
+          "mean": 3888.320132013201,
+          "median": 3660.0,
+          "std": 1346.269678884466,
+          "min": 976.0,
+          "max": 7605.0
+        },
+        "inactive": {
+          "mean": 3919.874781595807,
+          "median": 3722.0,
+          "std": 1347.9629430988791,
+          "min": 968.0,
+          "max": 8000.0
+        },
+        "mean_difference": -31.554649582605634,
+        "effect_size": 0.023423844766300137,
+        "significant": false
+      },
+      "throttle": {
+        "active": {
+          "mean": 0.28135313531353134,
+          "median": 0.15,
+          "std": 0.3434811994989127,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.27456027955736745,
+          "median": 0.15,
+          "std": 0.34119868056324104,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": 0.006792855756163896,
+        "effect_size": 0.01984231816310403,
+        "significant": false
+      },
+      "brake": {
+        "active": {
+          "mean": 0.03161716171617162,
+          "median": 0.0,
+          "std": 0.16050760193161678,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.04396427878081925,
+          "median": 0.0,
+          "std": 0.19202308185857547,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.012347117064647632,
+        "effect_size": 0.06977022141937383,
+        "significant": false
+      }
+    },
+    "significant_features": [],
+    "root_cause_hypothesis": "No clear pattern identified for this DTC"
+  },
+  "P0198": {
+    "occurrences": 909,
+    "conditions": {
+      "speed": {
+        "active": {
+          "mean": 109.38641364136416,
+          "median": 106.2,
+          "std": 70.05435084536975,
+          "min": 0.0,
+          "max": 527.6
+        },
+        "inactive": {
+          "mean": 109.38128324597166,
+          "median": 106.6,
+          "std": 71.43969149361212,
+          "min": 0.0,
+          "max": 527.7
+        },
+        "mean_difference": 0.005130395392498599,
+        "effect_size": 7.251400024831934e-05,
+        "significant": false
+      },
+      "rpm": {
+        "active": {
+          "mean": 3874.061606160616,
+          "median": 3654.0,
+          "std": 1281.2855434201986,
+          "min": 968.0,
+          "max": 7932.0
+        },
+        "inactive": {
+          "mean": 3922.3909920403803,
+          "median": 3722.0,
+          "std": 1359.0099320626964,
+          "min": 969.0,
+          "max": 8000.0
+        },
+        "mean_difference": -48.32938587976423,
+        "effect_size": 0.03659322166431755,
+        "significant": false
+      },
+      "throttle": {
+        "active": {
+          "mean": 0.266028602860286,
+          "median": 0.15,
+          "std": 0.3320397567491469,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.2772646088138226,
+          "median": 0.15,
+          "std": 0.3431722821139528,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.011236005953536576,
+        "effect_size": 0.03327689212433146,
+        "significant": false
+      },
+      "brake": {
+        "active": {
+          "mean": 0.04148514851485148,
+          "median": 0.0,
+          "std": 0.18703604875717694,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "inactive": {
+          "mean": 0.042222869345758106,
+          "median": 0.0,
+          "std": 0.18780337173787578,
+          "min": 0.0,
+          "max": 1.0
+        },
+        "mean_difference": -0.0007377208309066255,
+        "effect_size": 0.003936188377558715,
         "significant": false
       }
     },

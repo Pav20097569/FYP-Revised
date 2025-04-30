@@ -22,5 +22,77 @@
       "max_depth": null,
       "class_weight": "balanced"
     }
+  },
+  "dtc_P0162": {
+    "feature_importance": {
+      "speed_mean": 0.0,
+      "speed_max": 0.0,
+      "speed_std": 0.0,
+      "speed_changes": 0.0,
+      "rpm_mean": 0.0,
+      "rpm_max": 0.0,
+      "rpm_std": 0.0,
+      "throttle_mean": 0.0,
+      "throttle_max": 0.0,
+      "throttle_std": 0.0,
+      "throttle_changes": 0.0,
+      "brake_mean": 0.0,
+      "brake_max": 0.0,
+      "brake_std": 0.0,
+      "brake_changes": 0.0
+    },
+    "model_params": {
+      "n_estimators": 100,
+      "max_depth": null,
+      "class_weight": "balanced"
+    }
+  },
+  "dtc_P0175": {
+    "feature_importance": {
+      "speed_mean": 0.0,
+      "speed_max": 0.0,
+      "speed_std": 0.0,
+      "speed_changes": 0.0,
+      "rpm_mean": 0.0,
+      "rpm_max": 0.0,
+      "rpm_std": 0.0,
+      "throttle_mean": 0.0,
+      "throttle_max": 0.0,
+      "throttle_std": 0.0,
+      "throttle_changes": 0.0,
+      "brake_mean": 0.0,
+      "brake_max": 0.0,
+      "brake_std": 0.0,
+      "brake_changes": 0.0
+    },
+    "model_params": {
+      "n_estimators": 100,
+      "max_depth": null,
+      "class_weight": "balanced"
+    }
+  },
+  "dtc_P0198": {
+    "feature_importance": {
+      "speed_mean": 0.0,
+      "speed_max": 0.0,
+      "speed_std": 0.0,
+      "speed_changes": 0.0,
+      "rpm_mean": 0.0,
+      "rpm_max": 0.0,
+      "rpm_std": 0.0,
+      "throttle_mean": 0.0,
+      "throttle_max": 0.0,
+      "throttle_std": 0.0,
+      "throttle_changes": 0.0,
+      "brake_mean": 0.0,
+      "brake_max": 0.0,
+      "brake_std": 0.0,
+      "brake_changes": 0.0
+    },
+    "model_params": {
+      "n_estimators": 100,
+      "max_depth": null,
+      "class_weight": "balanced"
+    }
   }
 }

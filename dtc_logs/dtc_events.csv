@@ -1,2 +1,5 @@
 timestamp,event_type,dtc_code,description,status
 20250429_214724,added,P0100,"Engine Malfunction",active
+20250430_154438,added,P0162,"02 Sensor Circuit Malfunction (Bank 2 Sensor 3)",active
+20250430_154456,added,P0175,"System too Rich (Bank 2)",active
+20250430_154516,added,P0198,"Engine Oil Temperature Sensor High",active
