@@ -1,3 +1,10 @@
 flask
 flask-socketio
 eventlet
+pandas
+numpy
+scikit-learn
+scikit-image
+matplotlib
+joblib
+pywin32

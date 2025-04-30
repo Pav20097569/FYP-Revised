@@ -1,0 +1,11 @@
+{
+  "timestamp": "20250430_193701",
+  "event_type": "added",
+  "dtcs": {
+    "P0198": {
+      "description": "Multiple Cylinder Misfire",
+      "status": "active",
+      "timestamp": 1746038221.8209088
+    }
+  }
+}

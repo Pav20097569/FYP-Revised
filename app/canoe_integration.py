@@ -94,14 +94,8 @@ class CANoeInterface:
         try:
             if not self.connected:
                 return None
-                
-
-
-            # For example, you might access system variables
-            # dtc_var = self.app.Environment.GetVariable("NameSpace", "DTC")
-            # dtc_value = dtc_var.Value
             
-            # For demonstration, we'll create some sample DTC data
+            # Test Data for DTCs (for development purposes)
             # In a real implementation, this would come from CANoe
             sample_dtcs = {
                 "P0300": {

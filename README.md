@@ -1,93 +1,139 @@
-# Forza Telemetry Dashboard
+# Forza Dashboard with CANoe Integration
 
-A real-time web dashboard for displaying Forza Horizon 5 telemetry data.
+A real-time telemetry dashboard that integrates Forza Horizon 5 with Vector CANoe for automotive diagnostics and machine learning-based analysis.
+
+## Overview
+
+This project creates a bridge between the realistic driving simulation of Forza Horizon 5 and professional automotive diagnostic tools. It features:
+
+- Real-time telemetry visualization from Forza Horizon 5
+- Integration with Vector CANoe for DTC (Diagnostic Trouble Code) management
+- Machine learning-based anomaly detection and DTC prediction
+- Root cause analysis of driving patterns and DTCs
+- Comprehensive data logging and export for offline analysis
 
 ## Features
 
-- Real-time display of speed, RPM, gear, throttle and brake inputs
-- Smooth animations and transitions
-- Responsive design that works on all devices
-- Automatic connection status indicator
+- **Live Dashboard**: Real-time visualization of vehicle telemetry with smoothing algorithms
+- **CANoe Integration**: Capture and analyze DTCs from Vector CANoe
+- **AI Analysis**: Machine learning models to detect anomalies and predict potential DTCs
+- **Root Cause Analysis**: Statistical correlation between driving patterns and specific DTCs
+- **Data Export**: Export telemetry and analysis data for offline processing
 
-## Requirements
+## System Requirements
 
-- Python 3.7 or higher
-- Forza Horizon 5 game
-- Flask and Flask-SocketIO libraries
+- Windows 10/11 (for Forza Horizon 5 and CANoe)
+- Python 3.8 or higher
+- Forza Horizon 5 with Data Out enabled
+- Vector CANoe (optional, system will work in fallback mode without it)
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
 ## Installation
 
-1. Clone this repository or download the files
-2. Install required packages:
-
-```bash
+1. Clone the repository
+2. Install requirements:
+```
 pip install -r requirements.txt
 ```
+3. Configure Forza Horizon 5 Data Out to send UDP data to 127.0.0.1:5300
+4. (Optional) Set CANOE_CONFIG_PATH environment variable to point to your CANoe configuration
 
-3. Run the setup script to create necessary directories:
-
-```bash
-python setup.py
-```
-
-## Configuration in Forza Horizon 5
-
-1. Launch Forza Horizon 5
-2. Go to Settings > HUD and Gameplay
-3. Find "Data Out" settings
-4. Set:
-   - Data Out: ON
-   - Data Out IP Address: your computer's IP address where this server is running
-   - Data Out IP Port: 5300
-   - Data Out Packet Format: 324 bytes
-   - Data Out Car Indexes: 0-1000
-
-## Running the Dashboard
+## Usage
 
 Start the server:
-
-```bash
+```
 python main.py
 ```
 
 Then open a web browser and navigate to:
 ```
-http://localhost:5300
+http://127.0.0.1:5300
 ```
 
-## Troubleshooting
+## Project Structure
 
-### Not receiving telemetry data?
+```
+├── analysis_results/      # DTC analysis results and visualizations
+├── app/                   # Main application package
+│   ├── __pycache__/       # Python cache directory
+│   ├── __init__.py        # App initialization
+│   ├── canoe_integration.py  # CANoe integration module
+│   ├── data_learning.py   # Machine learning components
+│   ├── data_logger.py     # Telemetry logging module
+│   ├── data_parser.py     # Telemetry data parsing
+│   ├── forza_packet_format.py  # Forza telemetry packet definitions
+│   ├── telemetry_listener.py  # UDP listener for Forza telemetry
+│   └── websocket_handler.py  # WebSocket event handlers
+├── dtc_logs/              # Logs of DTC events
+├── models/                # Saved machine learning models
+├── telemetry_exports/     # Exported telemetry data in CSV format
+├── templates/             # HTML templates for web interface
+│   ├── index.html         # Main dashboard HTML
+│   └── model_dashboard.html  # Alternative dashboard visualization
+├── main.py                # Application entry point
+├── requirements.txt       # Python dependencies
+└── README.md              # This file
+```
 
-1. Make sure Forza Horizon 5 "Data Out" feature is properly configured
-2. Check if your firewall is blocking UDP port 5300
-3. Verify that your computer's IP address is correctly entered in Forza settings
-4. Try running the game and server on the same machine first
+Additional files:
+```
+├── check_project.py       # Project verification script
+├── fix_json.py            # JSON utility script
+├── model_analysis.py      # Model analysis utilities
+├── model_dashboard.py     # Dashboard model handler
+├── scriptForDTC.py        # DTC script utilities
+└── test_s3_connection.py  # S3 connection test utility
+```
 
-### Connection issues?
+## Data Flow
 
-- The dashboard will show "Disconnected" if the connection to the server is lost
-- Check that the server is still running
-- Reload the page to attempt reconnection
+1. Forza Horizon 5 sends UDP telemetry data
+2. The telemetry listener receives and validates the data
+3. Data is processed, logged, and distributed via WebSockets
+4. The dashboard displays real-time telemetry
+5. Machine learning models analyze telemetry for anomalies and DTC predictions
+6. CANoe integration captures and processes DTCs
+7. Root cause analysis identifies correlations between driving patterns and DTCs
 
-## File Structure
+## Machine Learning Components
 
-- `main.py` - Entry point for the application
-- `app/__init__.py` - Flask application setup
-- `app/data_parser.py` - Parses Forza telemetry data
-- `app/telemetry_listener.py` - Listens for UDP packets from Forza
-- `app/websocket_handler.py` - Handles WebSocket connections
-- `templates/index.html` - Dashboard HTML interface
-- `static/style.css` - Dashboard styling
+The system includes several machine learning components:
 
-## How the Data Parser Works
+- **Anomaly Detection**: Isolation Forest algorithm to detect unusual driving patterns
+- **DTC Prediction**: Random Forest classifiers to predict potential DTCs
+- **Root Cause Analysis**: Statistical correlation and effect size calculations
+- **Feature Engineering**: Time-window based feature extraction from telemetry data
 
-The data parser interprets the 324-byte UDP packets sent by Forza Horizon 5 according to the official data format. Each packet contains various vehicle telemetry values including:
+## API Documentation
 
-- Speed (in m/s, converted to km/h)
-- Engine RPM
-- Current gear
-- Throttle and brake positions
-- And many more values
+### WebSocket Events
 
-The parser extracts these values and passes them to the web interface via WebSockets for real-time display.
+#### Client to Server:
+- `connect`: Connect to the server
+- `disconnect`: Disconnect from the server
+- `export_telemetry`: Request telemetry export to CSV
+- `clear_dtcs`: Request clearing of all DTCs
+- `add_test_dtc`: Add a test DTC with specified parameters
+
+#### Server to Client:
+- `telemetry`: Real-time telemetry updates
+- `dtc_update`: Current state of all DTCs
+- `dtc_new`: Notification of new DTCs
+- `dtc_cleared`: Notification of cleared DTCs
+- `telemetry_analysis`: Results of AI analysis
+- `training_complete`: Notification of completed model training
+
+### REST API
+
+- `GET /api/dtcs`: Get current active DTCs
+- `GET /api/dtc-analysis`: Get DTC root cause analysis
+- `GET /api/train-models`: Trigger background training of ML models
+
+## License
+
+[MIT License](LICENSE)
+
+## Acknowledgments
+
+- The Forza Horizon 5 team for providing telemetry data output
+- Vector for CANoe diagnostic tools

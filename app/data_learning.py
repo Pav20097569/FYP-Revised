@@ -181,7 +181,7 @@ class DTCAnalyzer:
         if 'timestamp' in telemetry_df.columns:
             telemetry_df['timestamp'] = pd.to_numeric(telemetry_df['timestamp'], errors='coerce')
         
-        # Fix DTC timestamps - this is a critical step
+        # Fix DTC timestamps
         if 'timestamp' in dtc_df.columns:
             # First, try to directly convert to numeric if they're already numeric
             try:
